@@ -1,5 +1,6 @@
 <template>
-  <Navbar/>
+  <!-- <Navbar/>  -->
+  <!-- no Navbar on sign up and login page -->
   <router-view/>
 </template>
 
@@ -13,7 +14,9 @@ export default {
 </script>
 
 <style>
-  * {
+  body, html {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 </style>

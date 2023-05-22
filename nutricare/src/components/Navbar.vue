@@ -27,7 +27,7 @@
         <i class="fa-solid fa-gear"></i>
         <span>Settings</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'logout' }" @click="setActivetab('logout')">
+      <button class="tab" :class="{ active: activeTab === 'logout' }" @click="handleLogout">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>Log Out</span>
       </button>
@@ -37,6 +37,9 @@
 
 <script>
 import { ref } from 'vue';
+import { auth } from '@/firebase/config';
+import { signOut } from 'firebase/auth'
+
 export default {
     setup(){
         const activeTab = ref(null);
@@ -46,7 +49,11 @@ export default {
             console.log(activeTab)
         }
 
-        return { activeTab, setActivetab }
+        const handleLogout = () => {
+          singOut(auth)
+        }
+
+        return { activeTab, setActivetab, handleLogout }
     }
 }
 </script>
@@ -64,7 +71,7 @@ export default {
         flex-direction: column;
         justify-content: space-between;
         text-align: center;
-        padding: 20px 0px
+        padding: 20px 0px;
     }
     img {
         max-width: 50px
@@ -96,5 +103,8 @@ export default {
         border-radius: 50%;
         font-size: 20px;
         padding: 20px;
+    }
+    .options {
+      margin-bottom: 50px;
     }
 </style>
