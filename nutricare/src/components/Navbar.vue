@@ -50,7 +50,7 @@ export default {
         }
 
         const handleLogout = () => {
-          singOut(auth)
+          signOut(auth)
         }
 
         return { activeTab, setActivetab, handleLogout }

@@ -1,16 +1,20 @@
 <template>
 <div class="container">
     <div class="left">
+        <div class="logo">
+            <i class="fa-solid fa-leaf"></i>
+        </div>
         <div class="welcome">
             <h1>Hi there!</h1>
             <p>Welcome to <strong>Nutricare</strong>: Healthy Eating Community</p>
         </div>
         <div class="login">
             <div class="google-login">
-                <button>
+                <button @click='handleGoogleLogin'>
                     <i class="fa-brands fa-google"></i>
                     <span v-if='newUser'>Sign up with Google</span>
                     <span v-if='!newUser'>Log in with Google</span>
+                    <div v-if='errorSignup' class="error">{{ errorGoogle }}</div>
                 </button>
             </div>
             <div class="separator">
@@ -18,19 +22,20 @@
              </div>
             <div class="login-form">
                 <form v-if='newUser' id='form-signup' @submit.prevent='handleSignup'>
-                    <!-- <input type="text" required v-model="userName" placeholder="Username"> -->
+                    <input type="text" required v-model="userName" placeholder="Username">
                     <input type="email" required v-model="email" placeholder="Email">
                     <input type="password" required v-model="password" placeholder="Password">
-                    <div v-if='error' class="error">{{ error }}</div>
+                    <div v-if='errorSignup' class="error">{{ errorSignup }}</div>
                     <button class="btn">Sign up</button>
                 </form>
                 <form v-if='!newUser' id='form-login' @submit.prevent="handleLogin">
                     <input type="email" required v-model="email" placeholder="Email">
                     <input type="password" required v-model="password" placeholder="Password">
+                    <div v-if='errorLogin' class="error">{{ errorLogin }}</div>
                     <button class="btn">Log in</button>
                 </form>
-                <p v-if='!newUser'>Don't have an account? <button @click="newUser = !newUser">Sign up</button></p>
-                <p v-if='newUser'>Already have an account? <button @click="newUser = !newUser">Log in</button></p>
+                <p v-if='!newUser'>Don't have an account? <button class='switch-btn' @click="newUser = !newUser">Sign up</button></p>
+                <p v-if='newUser'>Already have an account? <button class='switch-btn' @click="newUser = !newUser">Log in</button></p>
             </div>
 
         </div>
@@ -49,33 +54,61 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import useSignup from '@/composables/useSignup.js'
+import useLogin from '@/composables/useLogin.js'
+import getUser from '@/composables/getUser'
+import useGoogleAuth from '@/composables/useGoogleAuth.js'
 
 export default {
-    components: {  },
-    setup(){
-        const email = ref('')
-        const password = ref('')
-        const userName = ref('')
+  components: {},
+  setup() {
+    const email = ref('')
+    const password = ref('')
+    const userName = ref('')
 
+    const { user } = getUser()
 
-        const router = useRouter()
-        const newUser = ref(false)
+    console.log(user)
 
-        const { signup, error } = useSignup()
+    const router = useRouter()
+    const newUser = ref(false)
 
-        const handleLogin = async () => {
-            console.log('user is trying to log in')
-        }
+    const { signup, error: errorSignup } = useSignup()
+    const { login, error: errorLogin } = useLogin()
 
-        const handleSignup = async () => {
-            await signup(email.value, password.value)
-            if(!error.value) {
-                router.push('/')
-            }
-        }
-
-        return { email, password, userName, newUser, error, handleLogin, handleSignup }
+    const handleLogin = async () => {
+      await login(email.value, password.value)
+      if (!errorLogin.value) {
+        router.push('/')
+      }
     }
+
+    const handleSignup = async () => {
+      await signup(email.value, password.value, userName.value)
+      if (!errorSignup.value) {
+        router.push('/')
+      }
+    }
+
+    const redirectAfterGoogleLogin = () => {
+      // Perform any additional logic before redirection if needed
+      router.push('/')
+    }
+
+    const { handleGoogleLogin, error: errorGoogle } = useGoogleAuth(redirectAfterGoogleLogin)
+
+    return {
+      email,
+      password,
+      userName,
+      newUser,
+      errorSignup,
+      handleLogin,
+      handleSignup,
+      errorLogin,
+      handleGoogleLogin,
+      errorGoogle
+    }
+  }
 }
 </script>
 
@@ -223,4 +256,22 @@ input {
     font-size: 90px;
 }
 
+.switch-btn {
+    padding: 5px;  
+    margin-left: 10px;  
+}
+
+.logo i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 40px;
+    margin: 30px;    
+    transition: transform 0.3s ease;      
+    z-index: 4;
+}
+
+.logo i:hover { 
+    transform: rotate(10deg);
+}
 </style>
