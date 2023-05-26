@@ -5,33 +5,34 @@
         <!-- place users profile image here -->
     </div>
     <div class="tabs">
-      <button class="tab" :class="{ active: activeTab === 'home' }" @click="setActivetab('home')">
+      <button class="tab" :class="{ active: activeTab === 'home' }" @click="setActivetab('home'); goTo('home') ">
         <i class="fa-solid fa-house"></i>
         <span>Home</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'calories' }" @click="setActivetab('calories')">
+      <button class="tab" :class="{ active: activeTab === 'calories' }" @click="setActivetab('calories'); goTo('calories')">
         <i class="fa-solid fa-chart-column"></i>
         <span>Calories</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'meal-planner' }" @click="setActivetab('meal-planner')">
+      <button class="tab" :class="{ active: activeTab === 'meal-planner' }" @click="setActivetab('meal-planner'); goTo('meal-planner')">
         <i class="fa-solid fa-book"></i>
         <span>Meal Planner</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'resources' }" @click="setActivetab('resources')">
+      <button class="tab" :class="{ active: activeTab === 'resources' }" @click="setActivetab('resources'); goTo('resources')">
         <i class="fa-solid fa-sitemap"></i>
         <span>Resources</span>
       </button>
     </div>
     <div class="options">
-      <button class="tab" :class="{ active: activeTab === 'settings' }" @click="setActivetab('settings')">
+      <button class="tab" :class="{ active: activeTab === 'settings' }" @click="setActivetab('settings'); goTo('settings')">
         <i class="fa-solid fa-gear"></i>
         <span>Settings</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'logout' }" @click="handleLogout">
+      <button class="tab" :class="{ active: activeTab === 'logout' }" @click="activateLogout">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>Log Out</span>
       </button>
     </div>
+    <Modal v-if="showModal" @close="showModal = false" />
   </nav>
 </template>
 
@@ -39,21 +40,31 @@
 import { ref } from 'vue';
 import { auth } from '@/firebase/config';
 import { signOut } from 'firebase/auth'
+import Modal from './Modal.vue';
+import { useRouter } from 'vue-router';
 
 export default {
+    components: { Modal },
     setup(){
-        const activeTab = ref(null);
+        const activeTab = ref('home');
+        const showModal = ref(false);
+        const router = useRouter()
+
+        const goTo = (path) => {
+          router.push(path)
+        }
+
 
         const setActivetab = (tab) => {
             activeTab.value = tab;
             console.log(activeTab)
         }
 
-        const handleLogout = () => {
-          signOut(auth)
+        const activateLogout = () => {
+          showModal.value = true;
         }
 
-        return { activeTab, setActivetab, handleLogout }
+        return { activeTab, setActivetab, activateLogout, showModal, goTo }
     }
 }
 </script>
@@ -65,7 +76,7 @@ export default {
         left: 0;
         min-width: 8%;
         height: 100vh;
-        background-color: #13192D;
+        background-color: black;
         color: white;
         display: flex;
         flex-direction: column;

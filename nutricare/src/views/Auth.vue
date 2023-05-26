@@ -90,7 +90,6 @@ export default {
     }
 
     const redirectAfterGoogleLogin = () => {
-      // Perform any additional logic before redirection if needed
       router.push('/')
     }
 

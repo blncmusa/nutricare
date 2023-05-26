@@ -13,13 +13,11 @@ const useGoogleAuth = (redirectAfterGoogleLogin) => {
     const provider = new GoogleAuthProvider()
     try {
       const result = await signInWithPopup(auth, provider)
-      // Handle successful login
       console.log('Google login success:', result)
       error.value = null
       isPending.value = false
-      redirectAfterGoogleLogin() // Call the provided callback function
+      redirectAfterGoogleLogin()
     } catch (err) {
-      // Handle login error
       console.error('Google login error:', err)
       error.value = err.message
       isPending.value = false
