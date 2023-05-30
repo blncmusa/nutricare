@@ -28,7 +28,7 @@ const requireNoAuth = (to, from, next) => {
 
 const routes = [
   {
-    path: '/home',
+    path: '/',
     name: 'home',
     component: Home,
     meta: { auth: false },
@@ -48,7 +48,7 @@ const routes = [
   },
   {
     path: '/meal-planner',
-    name: 'mealplanner',
+    name: 'meal-planner',
     component: MealPlanner,
     beforeEnter: requireAuth
   },
@@ -71,8 +71,13 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach(() => {
-
+router.beforeEach((to, from, next) => {
+  const currentRoute = to.name
+  const activeTab = currentRoute || 'home'
+  
+  localStorage.setItem('activeTab', activeTab)
+  
+  next()
 })
 
 export default router

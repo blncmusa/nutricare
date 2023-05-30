@@ -1,33 +1,33 @@
 <template>
   <nav>
     <div class="logo">
-        <i class="fa-solid fa-user user"></i> 
-        <!-- place users profile image here -->
+      <i class="fa-solid fa-user user"></i> 
+      <!-- place user's profile image here -->
     </div>
     <div class="tabs">
-      <button class="tab" :class="{ active: activeTab === 'home' }" @click="setActivetab('home'); goTo('home') ">
+      <button class="tab" :class="{ active: activeTab === 'home' }" @click="setActiveTab('home'); goTo('home')" data-tab="home">
         <i class="fa-solid fa-house"></i>
         <span>Home</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'calories' }" @click="setActivetab('calories'); goTo('calories')">
+      <button class="tab" :class="{ active: activeTab === 'calories' }" @click="setActiveTab('calories'); goTo('calories')" data-tab="calories">
         <i class="fa-solid fa-chart-column"></i>
         <span>Calories</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'meal-planner' }" @click="setActivetab('meal-planner'); goTo('meal-planner')">
+      <button class="tab" :class="{ active: activeTab === 'meal-planner' }" @click="setActiveTab('meal-planner'); goTo('meal-planner')" data-tab="meal-planner">
         <i class="fa-solid fa-book"></i>
         <span>Meal Planner</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'resources' }" @click="setActivetab('resources'); goTo('resources')">
+      <button class="tab" :class="{ active: activeTab === 'resources' }" @click="setActiveTab('resources'); goTo('resources')" data-tab="resources">
         <i class="fa-solid fa-sitemap"></i>
         <span>Resources</span>
       </button>
     </div>
     <div class="options">
-      <button class="tab" :class="{ active: activeTab === 'settings' }" @click="setActivetab('settings'); goTo('settings')">
+      <button class="tab" :class="{ active: activeTab === 'settings' }" @click="setActiveTab('settings'); goTo('settings')" data-tab="settings">
         <i class="fa-solid fa-gear"></i>
         <span>Settings</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'logout' }" @click="activateLogout">
+      <button class="tab" :class="{ active: activeTab === 'logout' }" @click="activateLogout" data-tab="logout">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>Log Out</span>
       </button>
@@ -37,35 +37,51 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { auth } from '@/firebase/config';
 import { signOut } from 'firebase/auth'
 import Modal from './Modal.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 export default {
-    components: { Modal },
-    setup(){
-        const activeTab = ref('home');
-        const showModal = ref(false);
-        const router = useRouter()
+  components: { Modal },
+setup() {
+  const activeTab = ref(localStorage.getItem('activeTab') || 'home');
+  const showModal = ref(false);
+  const router = useRouter();
+  const route = useRoute();
 
-        const goTo = (path) => {
-          router.push(path)
-        }
+  const goTo = (path) => {
+    router.push(path);
+  }
 
+  const setActiveTab = (tab) => {
+    activeTab.value = tab;
+    localStorage.setItem('activeTab', tab); // Store the active tab in localStorage
+  }
 
-        const setActivetab = (tab) => {
-            activeTab.value = tab;
-            console.log(activeTab)
-        }
+  const activateLogout = () => {
+    showModal.value = true;
+  }
 
-        const activateLogout = () => {
-          showModal.value = true;
-        }
+  // Handle active tab on page refresh
+  onMounted(() => {
+  const currentRouteName = route.name;
+  if (currentRouteName === 'home') {
+    setActiveTab('home');
+  } else if (currentRouteName === 'calories') {
+    setActiveTab('calories');
+  } else if (currentRouteName === 'meal-planner') {
+    setActiveTab('meal-planner');
+  } else if (currentRouteName === 'resources') {
+    setActiveTab('resources');
+  } else if (currentRouteName === 'settings') {
+    setActiveTab('settings');
+  }
+});
 
-        return { activeTab, setActivetab, activateLogout, showModal, goTo }
-    }
+  return { activeTab, setActiveTab, activateLogout, showModal, goTo }
+}
 }
 </script>
 
@@ -82,7 +98,7 @@ export default {
         flex-direction: column;
         justify-content: space-between;
         text-align: center;
-        padding: 20px 0px;
+        padding-top: 50px;
     }
     img {
         max-width: 50px

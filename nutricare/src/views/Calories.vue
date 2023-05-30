@@ -1,11 +1,17 @@
 <template>
-  
+    <Prompt/>
 </template>
 
 <script>
-export default {
+import { computed, nextTick, ref, shallowRef, watch } from 'vue'
+import Chart from 'chart.js/auto'
+import Prompt from '../components/Prompt.vue'
 
-}
+export default {
+    components: { Prompt },
+    setup() {
+
+    }}
 </script>
 
 <style>
