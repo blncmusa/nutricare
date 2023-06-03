@@ -12,11 +12,11 @@ const firebaseConfig = {
   };
 
   
-// init firebase
-initializeApp(firebaseConfig)
+// Init firebase
+const app = initializeApp(firebaseConfig);
 
-// init services
-const db = getFirestore()
-const auth = getAuth()
+// Init services
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-export { db, auth }
+export { db, auth };

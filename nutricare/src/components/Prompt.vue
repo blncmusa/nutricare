@@ -8,6 +8,7 @@
             :key="index"
             :class="{ active: currentStep === index }"
             class="step-item"
+            @click="currentStep = index"
           >
             <div class="step-number">{{ index + 1 }}</div>
             <div class="step-text">{{ step }}</div>
@@ -15,50 +16,53 @@
         </ul>
       </div>
       <div class="form-container">
-        <component :is="currentStepComponent" @form-submitted="handleFormSubmitted" />
+        <component :is="getCurrentStepComponent" @form-completed="handleFormCompleted" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { computed, ref } from 'vue';
+import { ref, computed } from 'vue';
 import PersonalDetails from './form-steps/PersonalDetails.vue';
+import ActivityLevel from './form-steps/ActivityLevel.vue';
+import WeightHeight from './form-steps/WeightHeight.vue';
+import Goals from './form-steps/Goals.vue';
+import Submission from './form-steps/Submission.vue';
 
 export default {
   components: {
     PersonalDetails,
+    ActivityLevel,
+    WeightHeight,
+    Goals,
+    Submission
   },
   setup() {
     const steps = ['Personal Details', 'Activity Level', 'Weight and Height', 'Goal', 'Summary and Confirmation'];
+    const components = [PersonalDetails, ActivityLevel, WeightHeight, Goals, Submission];
     const currentStep = ref(0);
 
-    const currentStepComponent = computed(() => {
-      switch (currentStep.value) {
-        case 0:
-          return PersonalDetails;
-        // Add other form components here for different steps
-        default:
-          return null;
+    const getCurrentStepComponent = computed(() => components[currentStep.value]);
+
+    const handleFormCompleted = () => {
+      if (currentStep.value < components.length - 1) {
+        currentStep.value++;
+      } else {
+        // All steps completed, handle the final form submission -- come back to this
       }
-    });
-
-    const handleFormSubmitted = () => {
-      // Handle the form submission
-
-      // Move to the next step
-      currentStep.value++;
     };
 
     return {
       steps,
       currentStep,
-      currentStepComponent,
-      handleFormSubmitted,
+      getCurrentStepComponent,
+      handleFormCompleted,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .container {
@@ -67,14 +71,14 @@ export default {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #f1f9ee;
 }
 
 .content {
   display: flex;
   width: 80%;
   height: 80%;
-  background-color: #ffffff;
+  background-color: #f1f9ee;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
@@ -88,6 +92,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .step-item {
@@ -118,7 +123,10 @@ export default {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   background-color: #ffffff;
-  padding: 3rem;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
 }
 
 .steps ul {

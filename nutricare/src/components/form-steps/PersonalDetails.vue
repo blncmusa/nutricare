@@ -3,47 +3,105 @@
     <h2>Personal Details</h2>
     <div class="form-group">
       <label for="firstName">First Name</label>
-      <input type="text" id="firstName" v-model="firstName" />
+      <input type="text" id="firstName" v-model="firstName" required />
     </div>
     <div class="form-group">
       <label for="lastName">Last Name</label>
-      <input type="text" id="lastName" v-model="lastName" />
+      <input type="text" id="lastName" v-model="lastName" required />
     </div>
     <div class="form-group">
       <label for="age">Age</label>
-      <input type="number" id="age" v-model="age" />
+      <input type="number" id="age" v-model="age" required />
     </div>
     <div class="form-group">
       <label for="gender">Gender</label>
       <select id="gender" v-model="gender">
         <option value="male">Male</option>
         <option value="female">Female</option>
-        <option value="other">Other</option>
       </select>
     </div>
-    <button @click.prevent="submitForm">Next</button>
+    <p class='error'>{{ error }}</p>
+    <button @click.prevent="submitForm" :disabled="isFormSubmitting">Next</button>
   </form>
 </template>
 
 <script>
+import { auth, db } from "@/firebase/config";
+import { ref, watch } from "vue";
+import { updateDoc, doc, getDoc, setDoc } from "firebase/firestore";
+
 export default {
-  data() {
-    return {
-      firstName: '',
-      lastName: '',
-      age: null,
-      gender: '',
+  setup(_, { emit }) {
+    const firstName = ref("");
+    const lastName = ref("");
+    const age = ref(null);
+    const gender = ref("");
+    const isFormIncomplete = ref(null);
+    const error = ref("");
+    const isFormSubmitting = ref(false);
+
+    const submitForm = async () => {
+      isFormIncomplete.value = false;
+      error.value = "";
+
+      if (!firstName.value || !lastName.value || !age.value || !gender.value) {
+        isFormIncomplete.value = true;
+        error.value = "Please fill in all fields."; // error if fields aren't completed
+        return;
+      }
+
+      const userId = auth.currentUser.uid;
+      const userRef = doc(db, "users", userId);
+
+      try {
+        const userData = {
+          firstName: firstName.value,
+          lastName: lastName.value,
+          age: age.value,
+          gender: gender.value,
+        };
+
+        isFormSubmitting.value = true;
+
+        // Checking if the user document already exists
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          // Updating the existing user document
+          await updateDoc(userRef, userData);
+        } else {
+          // Creating a new user document with the UID as the document ID
+          await setDoc(userRef, userData);
+        }
+
+        console.log("Personal details updated successfully");
+
+        // Retrieve the updated user profile
+        const updatedUserDocSnapshot = await getDoc(userRef);
+
+        isFormSubmitting.value = false;
+
+        emit("form-completed", "personal-details");
+      } catch (error) {
+        console.error("Error updating personal details:", error);
+        error.value = "An error occurred while updating personal details.";
+      }
     };
-  },
-  methods: {
-    submitForm() {
-      this.$emit('personal-details-submitted', {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        age: this.age,
-        gender: this.gender,
-      });
-    },
+
+    watch(isFormIncomplete, (value) => {
+      if (value) {
+        isFormSubmitting.value = false;
+      }
+    })
+    return {
+      firstName,
+      lastName,
+      age,
+      gender,
+      submitForm,
+      error,
+      isFormSubmitting,
+    };
   },
 };
 </script>
@@ -56,6 +114,7 @@ export default {
   justify-content: center;
   padding: 2rem;
   border-radius: 0 0 70px 70px;
+  min-width: 80%;
 }
 
 .personal-details-form h2 {
@@ -99,5 +158,9 @@ button {
 
 button:hover {
   background-color: #333333;
+}
+
+.error {
+  color: red;
 }
 </style>
