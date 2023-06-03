@@ -1,5 +1,5 @@
 <template>
-    <Prompt/>
+    <h2>Calories</h2>
 </template>
 
 <script>

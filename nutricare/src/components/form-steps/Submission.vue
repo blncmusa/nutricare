@@ -24,32 +24,9 @@ export default {
 
     console.log("currentUser:", currentUser.value);
 
-    const submitForm = async () => {
-      try {
-        const userId = auth.currentUser.uid;
-        const userRef = doc(db, "users", userId);
-
-        const userData = {
-          firstName: currentUser.value.firstName,
-          lastName: currentUser.value.lastName,
-          age: currentUser.value.age,
-          gender: currentUser.value.gender,
-          weight: currentUser.value.weight,
-          height: currentUser.value.height,
-          goal: currentUser.value.goal,
-        };
-
-        console.log("userData:", userData);
-
-        await updateDoc(userRef, userData);
-
-        console.log("Form submitted successfully");
-
-        // Emit an event to close the prompt and move to the next step
-        emit("form-completed", "submission");
-      } catch (error) {
-        console.error("Error submitting form:", error);
-      }
+    const submitForm = () => {
+          emit("form-completed");
+          console.log('emitting')
     };
 
     const fetchUserData = async () => {
@@ -77,7 +54,7 @@ export default {
 
     return {
       currentUser,
-      submitForm,
+      submitForm
     };
   },
 };
@@ -85,7 +62,7 @@ export default {
 
 <style scoped>
 .submission-container {
-  margin-top: 100px;
+  margin-top: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -95,5 +72,19 @@ export default {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 2rem;
+}
+
+button {
+  margin-top: 20px;
+  background-color: black;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #333333;
 }
 </style>

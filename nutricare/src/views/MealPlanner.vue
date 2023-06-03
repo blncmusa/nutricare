@@ -1,5 +1,5 @@
 <template>
-  
+  <h2>Meal Planner</h2>
 </template>
 
 <script>

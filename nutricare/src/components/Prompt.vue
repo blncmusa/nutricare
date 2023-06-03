@@ -71,7 +71,7 @@ export default {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-color: #f1f9ee;
+  font-size: 16px;
 }
 
 .content {

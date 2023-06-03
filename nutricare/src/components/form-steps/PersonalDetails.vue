@@ -16,8 +16,8 @@
     <div class="form-group">
       <label for="gender">Gender</label>
       <select id="gender" v-model="gender">
-        <option value="male">Male</option>
-        <option value="female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
       </select>
     </div>
     <p class='error'>{{ error }}</p>
