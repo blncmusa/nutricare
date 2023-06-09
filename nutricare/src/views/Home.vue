@@ -36,6 +36,7 @@ export default {
 
     const handlePromptClose = () => {
         showPrompt.value = false; 
+        console.log('emitting')
     };
 
     onMounted(checkProfileCompletion);

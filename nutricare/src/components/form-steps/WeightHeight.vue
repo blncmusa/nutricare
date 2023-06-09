@@ -41,7 +41,7 @@ export default {
 
         console.log("Weight and height updated successfully");
 
-        emit("form-completed", "weight-height");
+        emit("next-step", "weight-height");
       } catch (error) {
         console.error("Error updating weight and height:", error);
       }

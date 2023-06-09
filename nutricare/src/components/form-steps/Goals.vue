@@ -54,7 +54,7 @@ export default {
 
         console.log("Goal updated successfully");
 
-        this.$emit('form-completed', 'goals');
+        this.$emit('next-step', 'goals');
       } catch (error) {
         console.error("Error updating goal:", error);
       }

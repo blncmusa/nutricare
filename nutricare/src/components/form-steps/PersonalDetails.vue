@@ -81,7 +81,7 @@ export default {
 
         isFormSubmitting.value = false;
 
-        emit("form-completed", "personal-details");
+        emit("next-step", "personal-details");
       } catch (error) {
         console.error("Error updating personal details:", error);
         error.value = "An error occurred while updating personal details.";

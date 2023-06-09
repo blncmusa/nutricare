@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container"> 
     <div class="content">
       <div class="steps">
         <ul>
@@ -16,7 +16,10 @@
         </ul>
       </div>
       <div class="form-container">
-        <component :is="getCurrentStepComponent" @form-completed="handleFormCompleted" />
+        <component
+          :is="getCurrentStepComponent"
+          @next-step="handleNextStep"
+        />
       </div>
     </div>
   </div>
@@ -42,14 +45,15 @@ export default {
     const steps = ['Personal Details', 'Activity Level', 'Weight and Height', 'Goal', 'Summary and Confirmation'];
     const components = [PersonalDetails, ActivityLevel, WeightHeight, Goals, Submission];
     const currentStep = ref(0);
+    const showPrompt = ref(true);
 
     const getCurrentStepComponent = computed(() => components[currentStep.value]);
 
-    const handleFormCompleted = () => {
+    const handleNextStep = () => {
       if (currentStep.value < components.length - 1) {
         currentStep.value++;
       } else {
-        // All steps completed, handle the final form submission -- come back to this
+        showPrompt.value = false;
       }
     };
 
@@ -57,12 +61,11 @@ export default {
       steps,
       currentStep,
       getCurrentStepComponent,
-      handleFormCompleted,
+      handleNextStep,
     };
   },
 };
 </script>
-
 
 <style scoped>
 .container {

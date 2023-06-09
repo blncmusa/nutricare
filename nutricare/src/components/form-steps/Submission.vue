@@ -8,7 +8,7 @@
     <p><strong>Weight:</strong> {{ currentUser.weight }} kg</p>
     <p><strong>Height:</strong> {{ currentUser.height }} cm</p>
     <p><strong>Goal:</strong> {{ currentUser.goal }}</p>
-    <button @click="submitForm">Submit</button>
+    <button @click="handleEmit">Submit</button>
   </div>
 </template>
 
@@ -19,17 +19,16 @@ import { updateDoc, doc, getDoc } from "firebase/firestore";
 import getUser from "@/composables/getUser";
 
 export default {
-  setup(_, { emit }) {
-    const { user: currentUser } = getUser();
-
-    console.log("currentUser:", currentUser.value);
-
-    const submitForm = () => {
-          emit("form-completed");
-          console.log('emitting')
+  data() {
+    return {
+      currentUser: {},
     };
-
-    const fetchUserData = async () => {
+  },
+  created() {
+    this.fetchUserData();
+  },
+  methods: {
+    async fetchUserData() {
       try {
         const userId = auth.currentUser.uid;
         const userRef = doc(db, "users", userId);
@@ -37,28 +36,61 @@ export default {
 
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          currentUser.value.firstName = userData.firstName;
-          currentUser.value.lastName = userData.lastName;
-          currentUser.value.age = userData.age;
-          currentUser.value.gender = userData.gender;
-          currentUser.value.weight = userData.weight;
-          currentUser.value.height = userData.height;
-          currentUser.value.goal = userData.goal;
+          this.currentUser = {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            age: userData.age,
+            gender: userData.gender,
+            weight: userData.weight,
+            height: userData.height,
+            goal: userData.goal,
+          };
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
-    };
-
-    fetchUserData();
-
-    return {
-      currentUser,
-      submitForm
-    };
+    },
+    handleEmit() {
+      // Check if currentUser has been populated
+      if (this.currentUser.firstName) {
+        // Emit the form-completed event
+        this.$parent.$emit("form-completed");
+      }
+    },
   },
 };
 </script>
+
+<style scoped>
+.submission-container {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.submission-container h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+button {
+  margin-top: 20px;
+  background-color: black;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #333333;
+}
+</style>
+
+
 
 <style scoped>
 .submission-container {

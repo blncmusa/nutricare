@@ -59,7 +59,7 @@ export default {
 
         console.log("Activity level updated successfully");
 
-        emit("form-completed", "activity-level");
+        emit("next-step", "activity-level");
       } catch (error) {
         console.error("Error updating activity level:", error);
         // Handle error if necessary
