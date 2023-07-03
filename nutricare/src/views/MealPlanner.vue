@@ -1,10 +1,12 @@
 <template>
-  <h2>Meal Planner</h2>
 </template>
 
 <script>
-export default {
+import axios from 'axios';
+import cheerio from 'cheerio';
 
+export default {
+  
 }
 </script>
 
