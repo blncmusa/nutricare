@@ -4,7 +4,7 @@ import Authenticate from '../views/Auth.vue'
 import { auth } from '../firebase/config'
 import { onAuthStateChanged } from 'firebase/auth'
 import Calories from '../views/Calories.vue'
-import MealPlanner from '../views/MealPlanner.vue'
+import WeightTracker from '../views/WeightTracker.vue'
 import Resources from '../views/Resources.vue'
 import Settings from '../views/Settings.vue'
 
@@ -47,9 +47,9 @@ const routes = [
     beforeEnter: requireAuth
   },
   {
-    path: '/meal-planner',
-    name: 'meal-planner',
-    component: MealPlanner,
+    path: '/weight-tracker',
+    name: 'weight-tracker',
+    component: WeightTracker,
     beforeEnter: requireAuth
   },
   {

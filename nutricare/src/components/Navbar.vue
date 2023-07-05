@@ -13,9 +13,9 @@
         <i class="fa-solid fa-chart-column"></i>
         <span>Calories</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'meal-planner' }" @click="setActiveTab('meal-planner'); goTo('meal-planner')" data-tab="meal-planner">
+      <button class="tab" :class="{ active: activeTab === 'weight-tracker' }" @click="setActiveTab('weight-tracker'); goTo('weight-tracker')" data-tab="weight-tracker">
         <i class="fa-solid fa-book"></i>
-        <span>Meal Planner</span>
+        <span>Weight Tracker</span>
       </button>
       <button class="tab" :class="{ active: activeTab === 'resources' }" @click="setActiveTab('resources'); goTo('resources')" data-tab="resources">
         <i class="fa-solid fa-sitemap"></i>
@@ -71,8 +71,8 @@ setup() {
     setActiveTab('home');
   } else if (currentRouteName === 'calories') {
     setActiveTab('calories');
-  } else if (currentRouteName === 'meal-planner') {
-    setActiveTab('meal-planner');
+  } else if (currentRouteName === 'weight-tracker') {
+    setActiveTab('weight-tracker');
   } else if (currentRouteName === 'resources') {
     setActiveTab('resources');
   } else if (currentRouteName === 'settings') {
