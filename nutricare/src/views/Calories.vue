@@ -6,23 +6,23 @@
     <div class="today-calories">
           <h2>Today's Calories</h2>
           <p id='accumulator'>{{ accumulatedCalories }}</p>
+          <p class="error" style='color: red' v-if='showError'>Enter Date and Calories</p>
           <div>
-          <label for="calorieInput">Calorie Intake:</label>
-            <input type="number" id="calorieInput" v-model="newEntry.intake">
-            <button @click="addCalories">Add</button>
+            <div class="input">
+              <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin-left: 100px;">
+                <label for="dateInput">Date:</label>
+                <input type="date" id="dateInput" v-model="newEntry.date" required />
+              </div>
+              <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin-left: 50px;">
+                <label id='calorieName' for="calorieInput">Calorie Intake:</label>
+                <input type="number" id="calorieInput" v-model="newEntry.intake" required>
+                <button @click="addCalories">Add</button>
+              </div>
+            </div>
           </div>
             <button id='submit-calories' @click="addEntry">Submit Calories</button>
     </div>
   </div>
-  <!-- <div class="input">
-    <label for="dateInput">Date:</label>
-    <input type="date" id="dateInput" v-model="newEntry.date">
-
-    <label for="calorieInput">Calorie Intake:</label>
-    <input type="number" id="calorieInput" v-model="newEntry.intake">
-
-    <button @click="addEntry">Add Entry</button>
-  </div> -->
 </template>
 
 <script>
@@ -44,6 +44,8 @@ export default {
     const goal = 2000; // Example goal value
 
     const accumulatedCalories = ref(0)
+
+    const showError = ref(false);
 
     onMounted(() => {
       const chart = new Chart(chartContainer.value, {
@@ -74,21 +76,30 @@ export default {
 
     const addEntry = () => {
         
-        const chart = Chart.getChart(chartContainer.value);
+        if(newEntry.date && newEntry.intake) {
 
-        calorieData.push({ ...newEntry });
+          showError.value = false;
 
-        chart.data.labels = calorieData.map(entry => entry.date);
+          const chart = Chart.getChart(chartContainer.value);
+  
+          calorieData.push({ ...newEntry });
+  
+          chart.data.labels = calorieData.map(entry => entry.date);
+  
+          chart.data.datasets[0].data = calorieData.map(entry => entry.intake);
+  
+          chart.data.datasets[1].data = Array(calorieData.length).fill(goal);
+          chart.update();
+   
+          newEntry.date = '';
+          newEntry.intake = null;
+          accumulatedCalories.value = '0'
+  
+          console.log(calorieData);
+        } else {
+          showError.value = true;
+        }
 
-        chart.data.datasets[0].data = calorieData.map(entry => entry.intake);
-
-        chart.data.datasets[1].data = Array(calorieData.length).fill(goal);
-        chart.update();
- 
-        newEntry.date = '';
-        newEntry.intake = null;
-
-        console.log(calorieData);
     };
 
     const addCalories = () => {
@@ -96,7 +107,7 @@ export default {
     }
 
 
-    return { chartContainer, calorieData, addEntry, newEntry, accumulatedCalories, addCalories };
+    return { chartContainer, calorieData, addEntry, newEntry, accumulatedCalories, addCalories, showError };
   },
 };
 </script>
@@ -133,10 +144,7 @@ body {
 
 .input {
   width: 80%;
-  margin-left: 210px;
-  padding: 75px 0px; 
   display: flex;
-  gap: 20px;
   background: white;
   height: 10vh;
   text-align: center;
@@ -148,20 +156,19 @@ body {
 
 #dateInput {
   height: 50px;
-  padding: 20px;
-  padding-bottom: 50px;
-  font-size: 20px;
+  padding: 10px;
+  font-size: 10px;
   box-shadow: 0;
   text-align: center;
+  width: 80%;
 }
 
- #calorieInput {
+#calorieInput {
   height: 50px;
-  font-size: 20px;
+  font-size: 10px;
   box-shadow: 0;
   text-align: center;
-  margin: 80px 20px 0px 20px;
-
+  width: 80%;
 }
 
 button {
