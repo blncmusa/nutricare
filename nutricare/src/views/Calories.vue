@@ -27,10 +27,10 @@
 </template>
 
 <script>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import Chart from 'chart.js/auto';
 import { auth, db } from '@/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 
 export default {
   setup() {
@@ -68,7 +68,7 @@ export default {
           goal: userData.goal,
           activityLevel: userData.activityLevel
         };
-        // console.log(user.value) -- fricking work pls
+        // console.log(user.value)
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -125,6 +125,26 @@ export default {
       backgroundColor: 'rgba(255, 99, 132, 0.2)',
     });
 
+    const saveChartData = async () => {
+      try {
+        const userId = auth.currentUser.uid;
+        const chartDocRef = doc(db, 'charts', userId);
+
+        if (chartDocRef.exists()) {
+          await updateDoc(chartDocRef, {
+            calorieData: calorieData,
+            goal: goal.value,
+          });
+        } else {
+          await setDoc(chartDocRef, {
+            calorieData: calorieData,
+            goal: goal.value,
+          });
+        }
+      } catch (error) {
+        console.error('Error saving chart data:', error);
+      }
+    };
 
     onMounted(async () => {
       await fetchUserData();
@@ -158,53 +178,60 @@ export default {
           });
         }
 
-  watch(goal, (newGoal) => {
-    const datasetIndex = 1; // Index of the "Goal" dataset in the chart's datasets array
-    const goalDataset = chart.data.datasets[datasetIndex];
-    goalDataset.data = Array(calorieData.length).fill(newGoal);
-    chart.update();
+    watch(goal, (newGoal) => {
+      const datasetIndex = 1; // Index of the "Goal" dataset in the chart's datasets array
+      const goalDataset = chart.data.datasets[datasetIndex];
+      goalDataset.data = Array(calorieData.length).fill(newGoal);
+      chart.update();
+    });
+
+    console.log(goal.value);
   });
 
-  console.log(goal.value);
-});
+  onBeforeUnmount(async () => {
+        await saveChartData();
+  });
 
-    const addEntry = () => {
-  if (newEntry.date && newEntry.intake) {
-    showError.value = false;
 
-    const existingEntryIndex = calorieData.findIndex(
-      (entry) => entry.date === newEntry.date
-    );
+  const addEntry = () => {
+    if (newEntry.date && newEntry.intake) {
+        showError.value = false;
+
+        const existingEntryIndex = calorieData.findIndex(
+          (entry) => entry.date === newEntry.date
+        );
 
     const chart = Chart.getChart(chartContainer.value);
 
     if (existingEntryIndex !== -1) {
-      calorieData.splice(existingEntryIndex, 1, { ...newEntry });
+        calorieData.splice(existingEntryIndex, 1, { ...newEntry });
+      } else {
+        calorieData.push({ ...newEntry });
+      }
+
+      chart.data.labels = calorieData.map((entry) => entry.date);
+      chart.data.datasets[0].data = calorieData.map((entry) => entry.intake);
+
+       const goalData = Array(calorieData.length).fill(goal.value);
+      chart.data.datasets[1].data = goalData;
+
+      chart.update();
+      saveChartData();
+
+      newEntry.date = '';
+      newEntry.intake = null;
+      accumulatedCalories.value = '0';
+
+      console.log(calorieData);
     } else {
-      calorieData.push({ ...newEntry });
+      showError.value = true;
     }
+  };
 
-    chart.data.labels = calorieData.map((entry) => entry.date);
-    chart.data.datasets[0].data = calorieData.map((entry) => entry.intake);
 
-    const goalData = Array(calorieData.length).fill(goal.value);
-    chart.data.datasets[1].data = goalData;
-
-    chart.update();
-
-    newEntry.date = '';
-    newEntry.intake = null;
-    accumulatedCalories.value = '0';
-
-    console.log(calorieData);
-  } else {
-    showError.value = true;
-  }
-};
-
-    const addCalories = () => {
-      accumulatedCalories.value = Number(accumulatedCalories.value) + Number(newEntry.intake);
-    };
+  const addCalories = () => {
+    accumulatedCalories.value = Number(accumulatedCalories.value) + Number(newEntry.intake);
+  };
 
     fetchUserData(); // Fetch user data on component setup
 
@@ -254,7 +281,6 @@ body {
   justify-content: center;
   flex-direction: column;
   border: 2px solid black;
-  z-index: 1;
   padding: 50px;
 }
 
@@ -295,8 +321,8 @@ button {
 .submit {
   position: absolute;
   top: 200px;
-  left: 800px;
-  z-index: 4;
+  left: 740px;
+  z-index: 1;
 }
 
 #accumulator {
